@@ -17,7 +17,10 @@ AUTH_HEADER="Authorization: token ${GITHUB_TOKEN}"
 get_latest() {
 	local dockerfile=$1
 	local repo=$(cat "${dockerfile}" | grep -m 1 REPOSITORY | awk '{print $(NF)}'|awk -F= '{print $(NF)}')
-	local current=$(cat "${dockerfile}" | grep -m 1 VERSION | awk '{print $(NF)}'|awk -F= '{print $(NF)}')
+	if [[ "$repo" == "" ]]; then
+		return
+	fi
+	local current=$(cat "${dockerfile}" | grep -m 1 TAG_STRIP | awk '{print $(NF)}')$(cat "${dockerfile}" | grep -m 1 VERSION | awk '{print $(NF)}'|awk -F= '{print $(NF)}')
 	local sha=$(cat "${dockerfile}" | grep -m 1 FILE_SHA256SUM | awk '{print $(NF)}'|awk -F= '{print $(NF)}')
 	local url=$(cat "${dockerfile}" | grep -m 1 FILE_URL | awk '{print $(NF)}')
 	local tag_strip=$(cat "${dockerfile}" | grep -m 1 TAG_STRIP | awk '{print $(NF)}')
@@ -37,7 +40,7 @@ get_latest() {
 		name="-"
 	fi
 
-	local dir=${repo#*/}
+	local dir=$(dirname $dockerfile)
 
 	if [[ "$tag" =~ "$current" ]] || [[ "$name" =~ "$current" ]] || [[ "$current" =~ "$tag" ]] || [[ "$current" == "master" ]]; then
 		echo -e "\e[36m${dir}:\e[39m current ${current} | ${tag} | ${name}"
@@ -45,6 +48,7 @@ get_latest() {
 		# add to the bad versions
 		bad_versions+=( "${dir}" )
 		echo -e "\e[31m${dir}:\e[39m current ${current} | ${tag} | ${name} | https://github.com/${repo}/releases"
+		[ "$tag_strip" ] || tag_strip="TaTa"
 		local VERSION=$(echo $tag|sed "s/$tag_strip//g")
 		local REPOSITORY=${repo}
 		url=$(eval echo $url)

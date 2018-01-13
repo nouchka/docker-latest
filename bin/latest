@@ -2,4 +2,5 @@
 
 docker run --rm \
 	-v "$(pwd):/root/latest:ro" \
+	-e GITHUB_TOKEN=$GITHUB_TOKEN_READ_PUBLIC \
 	nouchka/latest
