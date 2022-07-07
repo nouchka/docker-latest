@@ -7,9 +7,9 @@ RUN apt-get update && \
 	DEBIAN_FRONTEND=noninteractive apt-get -yq --no-install-recommends install curl jq ca-certificates && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY latest.sh /latest
-RUN chmod +x /latest
+COPY latest.sh /usr/sbin/latest
+RUN chmod +x /usr/sbin/latest
 
 VOLUME /root/latest
 
-ENTRYPOINT [ "/latest" ]
+ENTRYPOINT [ "/usr/sbin/latest" ]
