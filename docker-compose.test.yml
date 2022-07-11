@@ -1,4 +1,8 @@
 sut:
   build: .
-  entrypoint: latest
+  entrypoint: bash -c 'latest|egrep "latest|dl.file"'
   command: version
+  environment:
+    - GITHUB_TOKEN
+  volumes:
+    - "./test/:/root/latest/:ro"
